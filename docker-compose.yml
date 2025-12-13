@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build:
+      context: ./backend
+    depends_on:
+      - mongo
+    env_file:
+      - ./backend/.env.docker
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: ["php", "-d", "variables_order=EGPCS", "-S", "0.0.0.0:8000", "-t", "public"]
+
+  web:
+    build:
+      context: ./frontend
+    depends_on:
+      - api
+    env_file:
+      - ./frontend/.env.docker
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    command: ["npm", "run", "dev", "--", "--host", "--port", "3000"]
+
+volumes:
+  mongo_data:
