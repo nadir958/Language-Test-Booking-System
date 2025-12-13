@@ -328,7 +328,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         }>,
  *     },
  *     validation?: bool|array{ // Validation configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         cache?: scalar|null, // Deprecated: Setting the "framework.validation.cache.cache" configuration option is deprecated. It will be removed in version 8.0.
  *         enable_attributes?: bool, // Default: true
  *         static_method?: list<scalar|null>,
@@ -350,7 +350,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         enabled?: bool, // Default: false
  *     },
  *     serializer?: bool|array{ // Serializer configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         enable_attributes?: bool, // Default: true
  *         name_converter?: scalar|null,
  *         circular_reference_handler?: scalar|null,
@@ -367,7 +367,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         }>,
  *     },
  *     property_access?: bool|array{ // Property access configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         magic_call?: bool, // Default: false
  *         magic_get?: bool, // Default: true
  *         magic_set?: bool, // Default: true
@@ -375,11 +375,11 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         throw_exception_on_invalid_property_path?: bool, // Default: true
  *     },
  *     type_info?: bool|array{ // Type info configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         aliases?: array<string, scalar|null>,
  *     },
  *     property_info?: bool|array{ // Property info configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         with_constructor_extractor?: bool, // Registers the constructor extractor.
  *     },
  *     cache?: array{ // Cache configuration
@@ -643,7 +643,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         }>,
  *     },
  *     uid?: bool|array{ // Uid configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         default_uuid_version?: 7|6|4|1, // Default: 7
  *         name_based_uuid_version?: 5|3, // Default: 5
  *         name_based_uuid_namespace?: scalar|null,
@@ -688,28 +688,633 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         enabled?: bool, // Default: false
  *     },
  * }
+ * @psalm-type SecurityConfig = array{
+ *     access_denied_url?: scalar|null, // Default: null
+ *     session_fixation_strategy?: "none"|"migrate"|"invalidate", // Default: "migrate"
+ *     hide_user_not_found?: bool, // Deprecated: The "hide_user_not_found" option is deprecated and will be removed in 8.0. Use the "expose_security_errors" option instead.
+ *     expose_security_errors?: \Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel::None|\Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel::AccountStatus|\Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel::All, // Default: "none"
+ *     erase_credentials?: bool, // Default: true
+ *     access_decision_manager?: array{
+ *         strategy?: "affirmative"|"consensus"|"unanimous"|"priority",
+ *         service?: scalar|null,
+ *         strategy_service?: scalar|null,
+ *         allow_if_all_abstain?: bool, // Default: false
+ *         allow_if_equal_granted_denied?: bool, // Default: true
+ *     },
+ *     password_hashers?: array<string, string|array{ // Default: []
+ *         algorithm?: scalar|null,
+ *         migrate_from?: list<scalar|null>,
+ *         hash_algorithm?: scalar|null, // Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms. // Default: "sha512"
+ *         key_length?: scalar|null, // Default: 40
+ *         ignore_case?: bool, // Default: false
+ *         encode_as_base64?: bool, // Default: true
+ *         iterations?: scalar|null, // Default: 5000
+ *         cost?: int, // Default: null
+ *         memory_cost?: scalar|null, // Default: null
+ *         time_cost?: scalar|null, // Default: null
+ *         id?: scalar|null,
+ *     }>,
+ *     providers?: array<string, array{ // Default: []
+ *         id?: scalar|null,
+ *         chain?: array{
+ *             providers?: list<scalar|null>,
+ *         },
+ *         memory?: array{
+ *             users?: array<string, array{ // Default: []
+ *                 password?: scalar|null, // Default: null
+ *                 roles?: list<scalar|null>,
+ *             }>,
+ *         },
+ *         ldap?: array{
+ *             service: scalar|null,
+ *             base_dn: scalar|null,
+ *             search_dn?: scalar|null, // Default: null
+ *             search_password?: scalar|null, // Default: null
+ *             extra_fields?: list<scalar|null>,
+ *             default_roles?: list<scalar|null>,
+ *             role_fetcher?: scalar|null, // Default: null
+ *             uid_key?: scalar|null, // Default: "sAMAccountName"
+ *             filter?: scalar|null, // Default: "({uid_key}={user_identifier})"
+ *             password_attribute?: scalar|null, // Default: null
+ *         },
+ *         mongodb?: array{
+ *             class: scalar|null, // The full entity class name of your user class.
+ *             property?: scalar|null, // Default: null
+ *             manager_name?: scalar|null, // Default: null
+ *         },
+ *         lexik_jwt?: array{
+ *             class?: scalar|null, // Default: "Lexik\\Bundle\\JWTAuthenticationBundle\\Security\\User\\JWTUser"
+ *         },
+ *     }>,
+ *     firewalls: array<string, array{ // Default: []
+ *         pattern?: scalar|null,
+ *         host?: scalar|null,
+ *         methods?: list<scalar|null>,
+ *         security?: bool, // Default: true
+ *         user_checker?: scalar|null, // The UserChecker to use when authenticating users in this firewall. // Default: "security.user_checker"
+ *         request_matcher?: scalar|null,
+ *         access_denied_url?: scalar|null,
+ *         access_denied_handler?: scalar|null,
+ *         entry_point?: scalar|null, // An enabled authenticator name or a service id that implements "Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface".
+ *         provider?: scalar|null,
+ *         stateless?: bool, // Default: false
+ *         lazy?: bool, // Default: false
+ *         context?: scalar|null,
+ *         logout?: array{
+ *             enable_csrf?: bool|null, // Default: null
+ *             csrf_token_id?: scalar|null, // Default: "logout"
+ *             csrf_parameter?: scalar|null, // Default: "_csrf_token"
+ *             csrf_token_manager?: scalar|null,
+ *             path?: scalar|null, // Default: "/logout"
+ *             target?: scalar|null, // Default: "/"
+ *             invalidate_session?: bool, // Default: true
+ *             clear_site_data?: list<"*"|"cache"|"cookies"|"storage"|"executionContexts">,
+ *             delete_cookies?: array<string, array{ // Default: []
+ *                 path?: scalar|null, // Default: null
+ *                 domain?: scalar|null, // Default: null
+ *                 secure?: scalar|null, // Default: false
+ *                 samesite?: scalar|null, // Default: null
+ *                 partitioned?: scalar|null, // Default: false
+ *             }>,
+ *         },
+ *         switch_user?: array{
+ *             provider?: scalar|null,
+ *             parameter?: scalar|null, // Default: "_switch_user"
+ *             role?: scalar|null, // Default: "ROLE_ALLOWED_TO_SWITCH"
+ *             target_route?: scalar|null, // Default: null
+ *         },
+ *         required_badges?: list<scalar|null>,
+ *         custom_authenticators?: list<scalar|null>,
+ *         login_throttling?: array{
+ *             limiter?: scalar|null, // A service id implementing "Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface".
+ *             max_attempts?: int, // Default: 5
+ *             interval?: scalar|null, // Default: "1 minute"
+ *             lock_factory?: scalar|null, // The service ID of the lock factory used by the login rate limiter (or null to disable locking). // Default: null
+ *             cache_pool?: string, // The cache pool to use for storing the limiter state // Default: "cache.rate_limiter"
+ *             storage_service?: string, // The service ID of a custom storage implementation, this precedes any configured "cache_pool" // Default: null
+ *         },
+ *         x509?: array{
+ *             provider?: scalar|null,
+ *             user?: scalar|null, // Default: "SSL_CLIENT_S_DN_Email"
+ *             credentials?: scalar|null, // Default: "SSL_CLIENT_S_DN"
+ *             user_identifier?: scalar|null, // Default: "emailAddress"
+ *         },
+ *         remote_user?: array{
+ *             provider?: scalar|null,
+ *             user?: scalar|null, // Default: "REMOTE_USER"
+ *         },
+ *         jwt?: array{
+ *             provider?: scalar|null, // Default: null
+ *             authenticator?: scalar|null, // Default: "lexik_jwt_authentication.security.jwt_authenticator"
+ *         },
+ *         login_link?: array{
+ *             check_route: scalar|null, // Route that will validate the login link - e.g. "app_login_link_verify".
+ *             check_post_only?: scalar|null, // If true, only HTTP POST requests to "check_route" will be handled by the authenticator. // Default: false
+ *             signature_properties: list<scalar|null>,
+ *             lifetime?: int, // The lifetime of the login link in seconds. // Default: 600
+ *             max_uses?: int, // Max number of times a login link can be used - null means unlimited within lifetime. // Default: null
+ *             used_link_cache?: scalar|null, // Cache service id used to expired links of max_uses is set.
+ *             success_handler?: scalar|null, // A service id that implements Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface.
+ *             failure_handler?: scalar|null, // A service id that implements Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface.
+ *             provider?: scalar|null, // The user provider to load users from.
+ *             secret?: scalar|null, // Default: "%kernel.secret%"
+ *             always_use_default_target_path?: bool, // Default: false
+ *             default_target_path?: scalar|null, // Default: "/"
+ *             login_path?: scalar|null, // Default: "/login"
+ *             target_path_parameter?: scalar|null, // Default: "_target_path"
+ *             use_referer?: bool, // Default: false
+ *             failure_path?: scalar|null, // Default: null
+ *             failure_forward?: bool, // Default: false
+ *             failure_path_parameter?: scalar|null, // Default: "_failure_path"
+ *         },
+ *         form_login?: array{
+ *             provider?: scalar|null,
+ *             remember_me?: bool, // Default: true
+ *             success_handler?: scalar|null,
+ *             failure_handler?: scalar|null,
+ *             check_path?: scalar|null, // Default: "/login_check"
+ *             use_forward?: bool, // Default: false
+ *             login_path?: scalar|null, // Default: "/login"
+ *             username_parameter?: scalar|null, // Default: "_username"
+ *             password_parameter?: scalar|null, // Default: "_password"
+ *             csrf_parameter?: scalar|null, // Default: "_csrf_token"
+ *             csrf_token_id?: scalar|null, // Default: "authenticate"
+ *             enable_csrf?: bool, // Default: false
+ *             post_only?: bool, // Default: true
+ *             form_only?: bool, // Default: false
+ *             always_use_default_target_path?: bool, // Default: false
+ *             default_target_path?: scalar|null, // Default: "/"
+ *             target_path_parameter?: scalar|null, // Default: "_target_path"
+ *             use_referer?: bool, // Default: false
+ *             failure_path?: scalar|null, // Default: null
+ *             failure_forward?: bool, // Default: false
+ *             failure_path_parameter?: scalar|null, // Default: "_failure_path"
+ *         },
+ *         form_login_ldap?: array{
+ *             provider?: scalar|null,
+ *             remember_me?: bool, // Default: true
+ *             success_handler?: scalar|null,
+ *             failure_handler?: scalar|null,
+ *             check_path?: scalar|null, // Default: "/login_check"
+ *             use_forward?: bool, // Default: false
+ *             login_path?: scalar|null, // Default: "/login"
+ *             username_parameter?: scalar|null, // Default: "_username"
+ *             password_parameter?: scalar|null, // Default: "_password"
+ *             csrf_parameter?: scalar|null, // Default: "_csrf_token"
+ *             csrf_token_id?: scalar|null, // Default: "authenticate"
+ *             enable_csrf?: bool, // Default: false
+ *             post_only?: bool, // Default: true
+ *             form_only?: bool, // Default: false
+ *             always_use_default_target_path?: bool, // Default: false
+ *             default_target_path?: scalar|null, // Default: "/"
+ *             target_path_parameter?: scalar|null, // Default: "_target_path"
+ *             use_referer?: bool, // Default: false
+ *             failure_path?: scalar|null, // Default: null
+ *             failure_forward?: bool, // Default: false
+ *             failure_path_parameter?: scalar|null, // Default: "_failure_path"
+ *             service?: scalar|null, // Default: "ldap"
+ *             dn_string?: scalar|null, // Default: "{user_identifier}"
+ *             query_string?: scalar|null,
+ *             search_dn?: scalar|null, // Default: ""
+ *             search_password?: scalar|null, // Default: ""
+ *         },
+ *         json_login?: array{
+ *             provider?: scalar|null,
+ *             remember_me?: bool, // Default: true
+ *             success_handler?: scalar|null,
+ *             failure_handler?: scalar|null,
+ *             check_path?: scalar|null, // Default: "/login_check"
+ *             use_forward?: bool, // Default: false
+ *             login_path?: scalar|null, // Default: "/login"
+ *             username_path?: scalar|null, // Default: "username"
+ *             password_path?: scalar|null, // Default: "password"
+ *         },
+ *         json_login_ldap?: array{
+ *             provider?: scalar|null,
+ *             remember_me?: bool, // Default: true
+ *             success_handler?: scalar|null,
+ *             failure_handler?: scalar|null,
+ *             check_path?: scalar|null, // Default: "/login_check"
+ *             use_forward?: bool, // Default: false
+ *             login_path?: scalar|null, // Default: "/login"
+ *             username_path?: scalar|null, // Default: "username"
+ *             password_path?: scalar|null, // Default: "password"
+ *             service?: scalar|null, // Default: "ldap"
+ *             dn_string?: scalar|null, // Default: "{user_identifier}"
+ *             query_string?: scalar|null,
+ *             search_dn?: scalar|null, // Default: ""
+ *             search_password?: scalar|null, // Default: ""
+ *         },
+ *         access_token?: array{
+ *             provider?: scalar|null,
+ *             remember_me?: bool, // Default: true
+ *             success_handler?: scalar|null,
+ *             failure_handler?: scalar|null,
+ *             realm?: scalar|null, // Default: null
+ *             token_extractors?: list<scalar|null>,
+ *             token_handler: string|array{
+ *                 id?: scalar|null,
+ *                 oidc_user_info?: string|array{
+ *                     base_uri: scalar|null, // Base URI of the userinfo endpoint on the OIDC server, or the OIDC server URI to use the discovery (require "discovery" to be configured).
+ *                     discovery?: array{ // Enable the OIDC discovery.
+ *                         cache?: array{
+ *                             id: scalar|null, // Cache service id to use to cache the OIDC discovery configuration.
+ *                         },
+ *                     },
+ *                     claim?: scalar|null, // Claim which contains the user identifier (e.g. sub, email, etc.). // Default: "sub"
+ *                     client?: scalar|null, // HttpClient service id to use to call the OIDC server.
+ *                 },
+ *                 oidc?: array{
+ *                     discovery?: array{ // Enable the OIDC discovery.
+ *                         base_uri: list<scalar|null>,
+ *                         cache?: array{
+ *                             id: scalar|null, // Cache service id to use to cache the OIDC discovery configuration.
+ *                         },
+ *                     },
+ *                     claim?: scalar|null, // Claim which contains the user identifier (e.g.: sub, email..). // Default: "sub"
+ *                     audience: scalar|null, // Audience set in the token, for validation purpose.
+ *                     issuers: list<scalar|null>,
+ *                     algorithm?: array<mixed>,
+ *                     algorithms: list<scalar|null>,
+ *                     key?: scalar|null, // Deprecated: The "key" option is deprecated and will be removed in 8.0. Use the "keyset" option instead. // JSON-encoded JWK used to sign the token (must contain a "kty" key).
+ *                     keyset?: scalar|null, // JSON-encoded JWKSet used to sign the token (must contain a list of valid public keys).
+ *                     encryption?: bool|array{
+ *                         enabled?: bool, // Default: false
+ *                         enforce?: bool, // When enabled, the token shall be encrypted. // Default: false
+ *                         algorithms: list<scalar|null>,
+ *                         keyset: scalar|null, // JSON-encoded JWKSet used to decrypt the token (must contain a list of valid private keys).
+ *                     },
+ *                 },
+ *                 cas?: array{
+ *                     validation_url: scalar|null, // CAS server validation URL
+ *                     prefix?: scalar|null, // CAS prefix // Default: "cas"
+ *                     http_client?: scalar|null, // HTTP Client service // Default: null
+ *                 },
+ *                 oauth2?: scalar|null,
+ *             },
+ *         },
+ *         http_basic?: array{
+ *             provider?: scalar|null,
+ *             realm?: scalar|null, // Default: "Secured Area"
+ *         },
+ *         http_basic_ldap?: array{
+ *             provider?: scalar|null,
+ *             realm?: scalar|null, // Default: "Secured Area"
+ *             service?: scalar|null, // Default: "ldap"
+ *             dn_string?: scalar|null, // Default: "{user_identifier}"
+ *             query_string?: scalar|null,
+ *             search_dn?: scalar|null, // Default: ""
+ *             search_password?: scalar|null, // Default: ""
+ *         },
+ *         remember_me?: array{
+ *             secret?: scalar|null, // Default: "%kernel.secret%"
+ *             service?: scalar|null,
+ *             user_providers?: list<scalar|null>,
+ *             catch_exceptions?: bool, // Default: true
+ *             signature_properties?: list<scalar|null>,
+ *             token_provider?: string|array{
+ *                 service?: scalar|null, // The service ID of a custom remember-me token provider.
+ *                 doctrine?: bool|array{
+ *                     enabled?: bool, // Default: false
+ *                     connection?: scalar|null, // Default: null
+ *                 },
+ *             },
+ *             token_verifier?: scalar|null, // The service ID of a custom rememberme token verifier.
+ *             name?: scalar|null, // Default: "REMEMBERME"
+ *             lifetime?: int, // Default: 31536000
+ *             path?: scalar|null, // Default: "/"
+ *             domain?: scalar|null, // Default: null
+ *             secure?: true|false|"auto", // Default: false
+ *             httponly?: bool, // Default: true
+ *             samesite?: null|"lax"|"strict"|"none", // Default: null
+ *             always_remember_me?: bool, // Default: false
+ *             remember_me_parameter?: scalar|null, // Default: "_remember_me"
+ *         },
+ *     }>,
+ *     access_control?: list<array{ // Default: []
+ *         request_matcher?: scalar|null, // Default: null
+ *         requires_channel?: scalar|null, // Default: null
+ *         path?: scalar|null, // Use the urldecoded format. // Default: null
+ *         host?: scalar|null, // Default: null
+ *         port?: int, // Default: null
+ *         ips?: list<scalar|null>,
+ *         attributes?: array<string, scalar|null>,
+ *         route?: scalar|null, // Default: null
+ *         methods?: list<scalar|null>,
+ *         allow_if?: scalar|null, // Default: null
+ *         roles?: list<scalar|null>,
+ *     }>,
+ *     role_hierarchy?: array<string, string|list<scalar|null>>,
+ * }
+ * @psalm-type DoctrineMongodbConfig = array{
+ *     document_managers?: array<string, array{ // Default: []
+ *         connection?: scalar|null,
+ *         database?: scalar|null,
+ *         logging?: bool, // Default: "%kernel.debug%"
+ *         profiler?: array{
+ *             enabled?: bool, // Default: "%kernel.debug%"
+ *             pretty?: bool, // Default: "%kernel.debug%"
+ *         },
+ *         default_document_repository_class?: scalar|null, // Default: "Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository"
+ *         default_gridfs_repository_class?: scalar|null, // Default: "Doctrine\\ODM\\MongoDB\\Repository\\DefaultGridFSRepository"
+ *         repository_factory?: scalar|null, // Default: "doctrine_mongodb.odm.container_repository_factory"
+ *         persistent_collection_factory?: scalar|null, // Default: null
+ *         auto_mapping?: bool, // Default: false
+ *         filters?: array<string, string|array{ // Default: []
+ *             class: scalar|null,
+ *             enabled?: bool, // Default: false
+ *             parameters?: array<string, mixed>,
+ *         }>,
+ *         metadata_cache_driver?: string|array{
+ *             type?: scalar|null, // Default: "array"
+ *             class?: scalar|null,
+ *             host?: scalar|null,
+ *             port?: int,
+ *             instance_class?: scalar|null,
+ *             id?: scalar|null,
+ *             namespace?: scalar|null,
+ *         },
+ *         use_transactional_flush?: bool, // Default: false
+ *         mappings?: array<string, bool|string|array{ // Default: []
+ *             mapping?: scalar|null, // Default: true
+ *             type?: scalar|null,
+ *             dir?: scalar|null,
+ *             prefix?: scalar|null,
+ *             alias?: scalar|null,
+ *             is_bundle?: bool,
+ *         }>,
+ *     }>,
+ *     connections?: array<string, array{ // Default: []
+ *         server?: scalar|null,
+ *         options?: array{
+ *             authMechanism?: "SCRAM-SHA-1"|"SCRAM-SHA-256"|"MONGODB-CR"|"MONGODB-X509"|"PLAIN"|"GSSAPI",
+ *             connectTimeoutMS?: int,
+ *             db?: scalar|null,
+ *             authSource?: scalar|null,
+ *             journal?: bool,
+ *             password?: scalar|null,
+ *             readPreference?: "primary"|"primaryPreferred"|"secondary"|"secondaryPreferred"|"nearest",
+ *             readPreferenceTags?: list<array<string, scalar|null>>,
+ *             replicaSet?: scalar|null,
+ *             socketTimeoutMS?: int,
+ *             ssl?: bool,
+ *             tls?: bool,
+ *             tlsAllowInvalidCertificates?: bool,
+ *             tlsAllowInvalidHostnames?: bool,
+ *             tlsCAFile?: scalar|null,
+ *             tlsCertificateKeyFile?: scalar|null,
+ *             tlsCertificateKeyFilePassword?: scalar|null,
+ *             tlsDisableCertificateRevocationCheck?: bool,
+ *             tlsDisableOCSPEndpointCheck?: bool,
+ *             tlsInsecure?: bool,
+ *             username?: scalar|null,
+ *             retryReads?: bool,
+ *             retryWrites?: bool,
+ *             w?: scalar|null,
+ *             wTimeoutMS?: int,
+ *         },
+ *         driver_options?: array{
+ *             context?: scalar|null, // Deprecated: The "context" driver option is deprecated and will be removed in 3.0. This option is ignored by the MongoDB driver version 2. // Default: null
+ *         },
+ *         autoEncryption?: array{
+ *             bypassAutoEncryption?: bool,
+ *             keyVaultClient?: scalar|null,
+ *             keyVaultNamespace?: scalar|null,
+ *             masterKey?: list<mixed>,
+ *             kmsProvider: array{
+ *                 type: scalar|null,
+ *                 accessKeyId?: scalar|null,
+ *                 secretAccessKey?: scalar|null,
+ *                 sessionToken?: scalar|null,
+ *                 tenantId?: scalar|null,
+ *                 clientId?: scalar|null,
+ *                 clientSecret?: scalar|null,
+ *                 keyVaultEndpoint?: scalar|null,
+ *                 identityPlatformEndpoint?: scalar|null,
+ *                 keyName?: scalar|null,
+ *                 keyVersion?: scalar|null,
+ *                 email?: scalar|null,
+ *                 privateKey?: scalar|null,
+ *                 endpoint?: scalar|null,
+ *                 projectId?: scalar|null,
+ *                 location?: scalar|null,
+ *                 keyRing?: scalar|null,
+ *                 key?: scalar|null,
+ *             },
+ *             schemaMap?: list<mixed>,
+ *             encryptedFieldsMap?: array<string, array{ // Default: []
+ *                 fields?: list<array{ // Default: []
+ *                     path: scalar|null,
+ *                     bsonType: scalar|null,
+ *                     keyId: mixed,
+ *                     queries?: array{
+ *                         queryType: scalar|null,
+ *                         min?: mixed,
+ *                         max?: mixed,
+ *                         sparsity?: int,
+ *                         precision?: int,
+ *                         trimFactor?: int,
+ *                         contention?: int,
+ *                     },
+ *                 }>,
+ *             }>,
+ *             extraOptions?: array{
+ *                 mongocryptdURI?: scalar|null,
+ *                 mongocryptdBypassSpawn?: bool,
+ *                 mongocryptdSpawnPath?: scalar|null,
+ *                 mongocryptdSpawnArgs?: list<scalar|null>,
+ *                 cryptSharedLibPath?: scalar|null,
+ *                 cryptSharedLibRequired?: bool,
+ *             },
+ *             bypassQueryAnalysis?: bool,
+ *             tlsOptions?: array{
+ *                 tlsCAFile?: scalar|null,
+ *                 tlsCertificateKeyFile?: scalar|null,
+ *                 tlsCertificateKeyFilePassword?: scalar|null,
+ *                 tlsDisableOCSPEndpointCheck?: bool,
+ *             },
+ *         },
+ *     }>,
+ *     resolve_target_documents?: array<string, scalar|null>,
+ *     types?: array<string, string|array{ // Default: []
+ *         class: scalar|null,
+ *     }>,
+ *     proxy_namespace?: scalar|null, // Default: "MongoDBODMProxies"
+ *     proxy_dir?: scalar|null, // Default: "%kernel.cache_dir%/doctrine/odm/mongodb/Proxies"
+ *     enable_native_lazy_objects?: bool, // Deprecated: The "enable_native_lazy_objects" option is deprecated and will be removed in 6.0. Native Lazy Objects are enable by default when using PHP 8.4+ and doctrine/mongodb-odm 2.14+. // Requires PHP 8.4+ and doctrine/mongodb-odm 2.14+ // Default: false
+ *     enable_lazy_ghost_objects?: bool, // Deprecated: The "enable_lazy_ghost_objects" option is deprecated and will be removed in 6.0. Native Lazy Objects are enable by default when using PHP 8.4+ and doctrine/mongodb-odm 2.14+. // Requires doctrine/mongodb-odm 2.12+ // Default: true
+ *     auto_generate_proxy_classes?: scalar|null, // Default: 3
+ *     hydrator_namespace?: scalar|null, // Default: "Hydrators"
+ *     hydrator_dir?: scalar|null, // Default: "%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators"
+ *     auto_generate_hydrator_classes?: scalar|null, // Default: 0
+ *     persistent_collection_namespace?: scalar|null, // Default: "PersistentCollections"
+ *     persistent_collection_dir?: scalar|null, // Default: "%kernel.cache_dir%/doctrine/odm/mongodb/PersistentCollections"
+ *     auto_generate_persistent_collection_classes?: scalar|null, // Default: 0
+ *     default_document_manager?: scalar|null,
+ *     default_connection?: scalar|null,
+ *     default_database?: scalar|null, // Default: "default"
+ *     default_commit_options?: array{
+ *         j?: bool,
+ *         timeout?: int,
+ *         w?: scalar|null,
+ *         wtimeout?: int,
+ *     },
+ *     controller_resolver?: bool|array{
+ *         enabled?: bool, // Default: true
+ *         auto_mapping?: bool, // Set to false to disable using route placeholders as lookup criteria when the object id doesn't match the argument name // Default: true
+ *     },
+ * }
+ * @psalm-type LexikJwtAuthenticationConfig = array{
+ *     public_key?: scalar|null, // The key used to sign tokens (useless for HMAC). If not set, the key will be automatically computed from the secret key. // Default: null
+ *     additional_public_keys?: list<scalar|null>,
+ *     secret_key?: scalar|null, // The key used to sign tokens. It can be a raw secret (for HMAC), a raw RSA/ECDSA key or the path to a file itself being plaintext or PEM. // Default: null
+ *     pass_phrase?: scalar|null, // The key passphrase (useless for HMAC) // Default: ""
+ *     token_ttl?: scalar|null, // Default: 3600
+ *     allow_no_expiration?: bool, // Allow tokens without "exp" claim (i.e. indefinitely valid, no lifetime) to be considered valid. Caution: usage of this should be rare. // Default: false
+ *     clock_skew?: scalar|null, // Default: 0
+ *     encoder?: array{
+ *         service?: scalar|null, // Default: "lexik_jwt_authentication.encoder.lcobucci"
+ *         signature_algorithm?: scalar|null, // Default: "RS256"
+ *     },
+ *     user_id_claim?: scalar|null, // Default: "username"
+ *     token_extractors?: array{
+ *         authorization_header?: bool|array{
+ *             enabled?: bool, // Default: true
+ *             prefix?: scalar|null, // Default: "Bearer"
+ *             name?: scalar|null, // Default: "Authorization"
+ *         },
+ *         cookie?: bool|array{
+ *             enabled?: bool, // Default: false
+ *             name?: scalar|null, // Default: "BEARER"
+ *         },
+ *         query_parameter?: bool|array{
+ *             enabled?: bool, // Default: false
+ *             name?: scalar|null, // Default: "bearer"
+ *         },
+ *         split_cookie?: bool|array{
+ *             enabled?: bool, // Default: false
+ *             cookies?: list<scalar|null>,
+ *         },
+ *     },
+ *     remove_token_from_body_when_cookies_used?: scalar|null, // Default: true
+ *     set_cookies?: array<string, array{ // Default: []
+ *         lifetime?: scalar|null, // The cookie lifetime. If null, the "token_ttl" option value will be used // Default: null
+ *         samesite?: "none"|"lax"|"strict", // Default: "lax"
+ *         path?: scalar|null, // Default: "/"
+ *         domain?: scalar|null, // Default: null
+ *         secure?: scalar|null, // Default: true
+ *         httpOnly?: scalar|null, // Default: true
+ *         partitioned?: scalar|null, // Default: false
+ *         split?: list<scalar|null>,
+ *     }>,
+ *     api_platform?: bool|array{ // API Platform compatibility: add check_path in OpenAPI documentation.
+ *         enabled?: bool, // Default: false
+ *         check_path?: scalar|null, // The login check path to add in OpenAPI. // Default: null
+ *         username_path?: scalar|null, // The path to the username in the JSON body. // Default: null
+ *         password_path?: scalar|null, // The path to the password in the JSON body. // Default: null
+ *     },
+ *     access_token_issuance?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         signature?: array{
+ *             algorithm: scalar|null, // The algorithm use to sign the access tokens.
+ *             key: scalar|null, // The signature key. It shall be JWK encoded.
+ *         },
+ *         encryption?: bool|array{
+ *             enabled?: bool, // Default: false
+ *             key_encryption_algorithm: scalar|null, // The key encryption algorithm is used to encrypt the token.
+ *             content_encryption_algorithm: scalar|null, // The key encryption algorithm is used to encrypt the token.
+ *             key: scalar|null, // The encryption key. It shall be JWK encoded.
+ *         },
+ *     },
+ *     access_token_verification?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         signature?: array{
+ *             header_checkers?: list<scalar|null>,
+ *             claim_checkers?: list<scalar|null>,
+ *             mandatory_claims?: list<scalar|null>,
+ *             allowed_algorithms?: list<scalar|null>,
+ *             keyset: scalar|null, // The signature keyset. It shall be JWKSet encoded.
+ *         },
+ *         encryption?: bool|array{
+ *             enabled?: bool, // Default: false
+ *             continue_on_decryption_failure?: bool, // If enable, non-encrypted tokens or tokens that failed during decryption or verification processes are accepted. // Default: false
+ *             header_checkers?: list<scalar|null>,
+ *             allowed_key_encryption_algorithms?: list<scalar|null>,
+ *             allowed_content_encryption_algorithms?: list<scalar|null>,
+ *             keyset: scalar|null, // The encryption keyset. It shall be JWKSet encoded.
+ *         },
+ *     },
+ *     blocklist_token?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         cache?: scalar|null, // Storage to track blocked tokens // Default: "cache.app"
+ *     },
+ * }
+ * @psalm-type NelmioCorsConfig = array{
+ *     defaults?: array{
+ *         allow_credentials?: bool, // Default: false
+ *         allow_origin?: list<scalar|null>,
+ *         allow_headers?: list<scalar|null>,
+ *         allow_methods?: list<scalar|null>,
+ *         allow_private_network?: bool, // Default: false
+ *         expose_headers?: list<scalar|null>,
+ *         max_age?: scalar|null, // Default: 0
+ *         hosts?: list<scalar|null>,
+ *         origin_regex?: bool, // Default: false
+ *         forced_allow_origin_value?: scalar|null, // Default: null
+ *         skip_same_as_origin?: bool, // Default: true
+ *     },
+ *     paths?: array<string, array{ // Default: []
+ *         allow_credentials?: bool,
+ *         allow_origin?: list<scalar|null>,
+ *         allow_headers?: list<scalar|null>,
+ *         allow_methods?: list<scalar|null>,
+ *         allow_private_network?: bool,
+ *         expose_headers?: list<scalar|null>,
+ *         max_age?: scalar|null, // Default: 0
+ *         hosts?: list<scalar|null>,
+ *         origin_regex?: bool,
+ *         forced_allow_origin_value?: scalar|null, // Default: null
+ *         skip_same_as_origin?: bool,
+ *     }>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
  *     services?: ServicesConfig,
  *     framework?: FrameworkConfig,
+ *     security?: SecurityConfig,
+ *     doctrine_mongodb?: DoctrineMongodbConfig,
+ *     lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
+ *     nelmio_cors?: NelmioCorsConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
+ *         security?: SecurityConfig,
+ *         doctrine_mongodb?: DoctrineMongodbConfig,
+ *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
+ *         security?: SecurityConfig,
+ *         doctrine_mongodb?: DoctrineMongodbConfig,
+ *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
+ *         security?: SecurityConfig,
+ *         doctrine_mongodb?: DoctrineMongodbConfig,
+ *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
