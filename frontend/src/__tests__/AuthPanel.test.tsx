@@ -15,7 +15,7 @@ describe('AuthPanel', () => {
   it('renders login form by default and toggles to register', () => {
     render(<AuthPanel />);
 
-    expect(screen.getByText(/login/i)).toHaveClass('active');
+    expect(screen.getAllByText(/login/i)[0]).toHaveClass('active');
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/name/i)).not.toBeInTheDocument();
