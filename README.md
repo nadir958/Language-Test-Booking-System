@@ -77,3 +77,15 @@
   ```bash
   curl -X DELETE -H "Authorization: Bearer <TOKEN>" http://localhost:8000/api/reservations/<RESERVATION_ID>
   ```
+
+## Manual test checklist (Docker)
+1. Start stack: `docker compose up --build` and ensure JWT keys exist: `docker compose exec api php bin/console lexik:jwt:generate-keypair --skip-if-exists`.
+2. Register a user via frontend (http://localhost:3000) or curl; confirm token stored and profile loads.
+3. Create a session via curl (see above) and refresh frontend sessions list to see it appear with seats.
+4. Book the session from the frontend; verify reservation appears in “My reservations” and seats decrement in the list.
+5. Cancel the reservation from the frontend; confirm it disappears and seats increment.
+6. Update account name/email; refresh and verify changes persist (and email uniqueness enforced).
+
+## Tests
+- Backend: PHPUnit (Symfony) — tests live in `backend/tests`. Run: `docker compose exec api php bin/phpunit`.
+- Frontend: Jest + React Testing Library — tests live in `frontend/src/__tests__`. Run: `docker compose exec web npm test`.
